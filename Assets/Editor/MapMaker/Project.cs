@@ -52,7 +52,7 @@ namespace ProductionTools
         {
             owner.currentProject.ClearMap();
 
-            Map newMap = new Map(name, new List<GameObject>(), mapDirectory);
+            Map newMap = new Map(name, mapDirectory);
             currentMap = newMap;
 
             owner.SaveProject();
@@ -63,16 +63,16 @@ namespace ProductionTools
             if(path != null)
             {
                 MapData myMapData = new MapData();
+                BinaryFormatter bFormatter = new BinaryFormatter();
+                FileStream binReader;
 
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(MapData));
-                StreamReader sReader;
                 try
                 {
-                    sReader = new StreamReader(path);
+                    binReader = new FileStream(path, FileMode.Open);
 
-                    myMapData = (MapData)xmlSerializer.Deserialize(sReader);
+                    myMapData = (MapData)bFormatter.Deserialize(binReader);
 
-                    sReader.Close();
+                    binReader.Close();
                 }
                 catch (FileNotFoundException e)
                 {
@@ -83,15 +83,33 @@ namespace ProductionTools
                     Debug.Log(e.Message);
                 }
 
+                //SetCurrent Map with new map data
+                currentMap = new Map(myMapData.mapName, myMapData.folderpath);
+
+                //SpawnObjects
                 foreach (GroupData group in myMapData.mapData)
                 {
-                    owner.AddCommand(new CreateObjectCommand(myObjectPool.objectList[group.buildingID], group.position, group.p0, group.p1, group.p2, group.lookAtPoint, group.spacing, group.buildingID, group.myType, group.rotateTo, group.rotationCounter, owner));
+                    owner.AddCommand(new CreateObjectCommand(
+                        myObjectPool.objectList[group.buildingID],
+                        new Vector3( group.posx,group.posy, group.posz),
+                        new Vector3( group.pos0x, group.pos0y, group.pos0z),
+                        new Vector3(group.pos1x, group.pos1y, group.pos1z),
+                        new Vector3(group.pos2x, group.pos2y, group.pos2z),
+                        new Vector3(group.lookposx, group.lookposy, group.lookposz),
+                        group.spacing,
+                        group.buildingID,
+                        group.myType,
+                        group.rotateTo,
+                        group.rotationCounter,
+                        owner
+                        ));
                 }
             }
             else
             {
                 Debug.Log("No Map Selected");
             }
+
             
         }
 
@@ -101,6 +119,9 @@ namespace ProductionTools
             if (target != null)
             {
                 currentMap.myMapData.mapData.Clear();
+
+                currentMap.myMapData.mapName = currentMap.name;
+                currentMap.myMapData.folderpath = currentMap.folderPath;
 
                 foreach (CreateObjectCommand obj in placedObjects)
                 {
@@ -119,7 +140,6 @@ namespace ProductionTools
                 }
 
                 target.WriteMap();
-                //myMaps[0] = target;
             }
             else
             {

@@ -16,10 +16,11 @@ namespace ProductionTools
         public MapData myMapData;
        
         private string fileName;
-        private string folderPath;
+        public  string folderPath;
         private string url;
 
-        public Map(string mapName, List<GameObject> placedObjects, string folderPath)
+
+        public Map(string mapName, string folderPath)
         {
             name = mapName;
             myMapData = new MapData();
@@ -33,89 +34,53 @@ namespace ProductionTools
             }
 
             url = Path.Combine(folderPath, fileName);
+
         }
 
         public void WriteMap()
         {
-
             Debug.Log("Buildings in Map: " + myMapData.mapData.Count);
 
             BinaryFormatter bFormatter = new BinaryFormatter();
-            XmlSerializer xmlSerializer = new XmlSerializer(typeof(MapData));
             FileStream fStream;
 
-
-            bool useBinary = true;
-
-            if (useBinary == true)
+            try
             {
-                try
+                if (Directory.Exists(folderPath) == true)
                 {
-                    if (Directory.Exists(folderPath) == true)
-                    {
-                        fStream = new FileStream(url, FileMode.Create);
+                    fStream = new FileStream(url + ".txt", FileMode.Create);
 
-                        bFormatter.Serialize(fStream, myMapData);
+                    bFormatter.Serialize(fStream, myMapData);
 
-                        fStream.Flush();
-                        fStream.Close();
+                    fStream.Flush();
+                    fStream.Close();
 
-                        Debug.Log("MapSaved: " + url);
-                    }
-                    else
-                    {
-                        Debug.Log("NoStreamingAssets");
-                    }
+                    Debug.Log("MapSaved: " + url);
                 }
-                catch (System.Exception e)
+                else
                 {
-                    Debug.Log(e.Message);
+                    Debug.Log("NoStreamingAssets");
                 }
             }
-            else//XML
+            catch (System.Exception e)
             {
-                try
-                {
-                    if (Directory.Exists(folderPath) == true)
-                    {
-                        fStream = new FileStream(url + ".txt", FileMode.Create);
-
-                        xmlSerializer.Serialize(fStream, myMapData);
-
-                        fStream.Flush();
-                        fStream.Close();
-
-                        Debug.Log("MapSaved: " + url);
-                    }
-                    else
-                    {
-                        Debug.Log("No Folder");
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    Debug.Log("ERROR: " + e.Message);
-                }
+                Debug.Log(e.Message);
             }
-
-
-
 
             AssetDatabase.Refresh();
         }
         public void ReadMap()
         {
-            //FileStream fStream = new FileStream(url, FileMode.Open);
             BinaryFormatter bFormatter = new BinaryFormatter();
-            XmlSerializer xmlSerializer = new XmlSerializer(typeof(MapData));
-            StreamReader sReader;
+            FileStream binReader;
+
             try
             {
-                sReader = new StreamReader(url);
+                binReader = new FileStream(url,FileMode.Open);
+                    
+                myMapData = (MapData)bFormatter.Deserialize(binReader);
 
-                myMapData = (MapData)xmlSerializer.Deserialize(sReader);
-
-                sReader.Close();
+                binReader.Close();
             }
             catch (FileNotFoundException e)
             {
@@ -127,6 +92,5 @@ namespace ProductionTools
             }
             Debug.Log(myMapData.mapData.Count);
         }
-       
     }
 }
