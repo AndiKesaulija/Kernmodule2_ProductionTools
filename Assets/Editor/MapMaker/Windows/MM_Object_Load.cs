@@ -55,7 +55,6 @@ namespace ProductionTools
                 LoadSelection(myObjects.sources);
 
 
-                owner.ReloadMapMaker();
                 owner.SaveProject();
                 parent.Close();
             }
@@ -97,7 +96,6 @@ namespace ProductionTools
 
             if (GUILayout.Button("Save"))
             {
-                owner.ReloadMapMaker();
                 parent.Close();
             }
 
@@ -128,7 +126,6 @@ namespace ProductionTools
                 LoadSelection(myObjects.sources);
 
 
-                owner.ReloadMapMaker();
                 owner.SaveProject();
                 parent.Close();
             }
@@ -152,12 +149,20 @@ namespace ProductionTools
                     GameObject tempInstance = Object.Instantiate(target[i]);
                     tempInstance.name = target[i].name;
 
-                    if (tempInstance.GetComponent<ObjectProperties>() == null)
+                    if (tempInstance.GetComponent<PlacedObject>() == null)
                     {
-                        tempInstance.AddComponent<ObjectProperties>();
-                        Debug.Log("Added ObjectProperties to Object");
+                        tempInstance.AddComponent<PlacedObject>();
+                        
                     }
-                    tempInstance.GetComponent<ObjectProperties>().buildingID = currID + i;
+
+                    //tempInstance.AddComponent<BoxCollider>();
+
+                    Renderer[] allRenderers = tempInstance.GetComponentsInChildren<Renderer>();
+                    foreach (Renderer R in allRenderers)
+                    {
+                        R.gameObject.AddComponent<BoxCollider>();
+                        R.gameObject.transform.tag = "SelectableObject";
+                    }
 
                     PrefabUtility.SaveAsPrefabAsset(tempInstance, assetPath + tempInstance.name + ".prefab");
                     Object.DestroyImmediate(tempInstance);

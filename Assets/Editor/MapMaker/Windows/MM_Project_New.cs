@@ -29,7 +29,6 @@ namespace ProductionTools
                 owner.ClearProject();
 
                 owner.currentProject = new Project(name, owner);
-                owner.ReloadMapMaker();
 
                 parent.Close();
 

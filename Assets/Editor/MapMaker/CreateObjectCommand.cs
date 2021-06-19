@@ -43,8 +43,6 @@ namespace ProductionTools
             this.rotationCounter = rotationCounter;
             this.myType = (ObjectType) myType;
 
-            Debug.Log(posA);
-
         }
 
         public void Execute()
@@ -81,17 +79,24 @@ namespace ProductionTools
             buildingID = GameObjectInstance.GetComponent<ObjectProperties>().buildingID;
             Prefab = owner.currentProject.myObjectPool.objectList[buildingID];
 
-            if (myType == ObjectType.single)
+            switch (myType)
             {
-                UpdateSingle();
-            }
-            if (myType == ObjectType.line)
-            {
-                UpdateLine();
-            }
-            if (myType == ObjectType.curve)
-            {
-                UpdateCurve();
+                case ObjectType.single:
+                    {
+                        UpdateSingle();
+                    }
+                break;
+                case ObjectType.line:
+                    {
+                        UpdateLine();
+
+                    }
+                    break;
+                case ObjectType.curve:
+                    {
+                        UpdateCurve();
+                    }
+                    break;
             }
           
         }
@@ -124,12 +129,9 @@ namespace ProductionTools
             GameObject PlaceObject = new GameObject("PlaceObject");
             handleTransform = PlaceObject.transform;
 
+            PlaceObject.tag = "SelectableObject";
             PlaceObject.transform.position = p1;//Set transform to midpoint
             PlaceObject.AddComponent<ObjectProperties >();
-
-            //PlaceObject.GetComponent<ObjectProperties >().p0 = p0;
-            //PlaceObject.GetComponent<ObjectProperties >().p1 = p1;
-            //PlaceObject.GetComponent<ObjectProperties >().p2 = p2;
 
             posA = handleTransform.InverseTransformPoint(p0);
             posB = handleTransform.InverseTransformPoint(p1);
@@ -138,10 +140,9 @@ namespace ProductionTools
             //SetCommandNumber
             PlaceObject.GetComponent<ObjectProperties>().commandNum = owner.allObjects.Count;
             PlaceObject.GetComponent<ObjectProperties>().spacing = spacing;
-            //PlaceObject.GetComponent<ObjectProperties >().buildingID = buildingID;
 
-
-            owner.myHandler.ObjectProperties.Add(PlaceObject.GetComponent<ObjectProperties >());
+            
+            owner.myHandler.ObjectProperties.Add(PlaceObject.GetComponent<ObjectProperties>());
             return PlaceObject;
 
         }
@@ -157,8 +158,14 @@ namespace ProductionTools
             rotation *= Quaternion.Euler(0, 90 * rotationCounter, 0);
             
             GameObject test = GameObject.Instantiate(Prefab, GameObjectInstance.transform, false);
+
+            //Add Object Script
+            test.AddComponent<PlacedObject>();
+
             test.transform.localPosition = new Vector3(0,0,0);
             test.transform.localRotation = rotation;
+            //SetTag
+            test.tag = "SelectableObject";
         }
         void UpdateLine()
         {
@@ -188,6 +195,8 @@ namespace ProductionTools
                 GameObject test = GameObject.Instantiate(Prefab, GameObjectInstance.transform, false);
                 test.transform.localPosition = pos;
                 test.transform.localRotation = rotation;
+                //SetTag
+                test.tag = "SelectableObject";
             }
         }
         void UpdateCurve()
@@ -218,6 +227,8 @@ namespace ProductionTools
                 GameObject test = GameObject.Instantiate(Prefab, GameObjectInstance.transform, false);
                 test.transform.localPosition = pos;
                 test.transform.localRotation = rotation;
+                //SetTag
+                test.tag = "SelectableObject";
             }
         }
 

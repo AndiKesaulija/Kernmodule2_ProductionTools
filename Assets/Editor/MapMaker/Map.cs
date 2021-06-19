@@ -45,7 +45,7 @@ namespace ProductionTools
             FileStream fStream;
 
 
-            bool useBinary = false;
+            bool useBinary = true;
 
             if (useBinary == true)
             {

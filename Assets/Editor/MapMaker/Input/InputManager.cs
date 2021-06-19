@@ -7,8 +7,20 @@ using UnityEditor;
 namespace ProductionTools
 {
     [ExecuteInEditMode]
+    public enum MouseState
+    {
+        NONE,
+        UP,
+        DRAGGED,
+        DOWN
+    }
+
     public class InputManager
     {
+        public bool onHover;
+
+        public MouseState state = MouseState.NONE;
+
         public IActionInput currentAction;
         public MapMaker owner;
 
@@ -18,33 +30,93 @@ namespace ProductionTools
         }
         public void HandleEvent(Event currEvent)
         {
+            //Disable selection in SceneView
+            HandleUtility.AddDefaultControl(GUIUtility.GetControlID(GetHashCode(), FocusType.Passive));
 
-            HandleUtility.AddDefaultControl(GUIUtility.GetControlID(GetHashCode(), FocusType.Passive));//Left Mouse Event
-
-            if (Selection.activeObject == null)
+            switch (state)
             {
-            }
+                case MouseState.NONE:
+                    {
+                        if (onHover == true)
+                        {
+                            if (currEvent.type == EventType.MouseDown && currEvent.button == 0)
+                            {
+                                SelectObject();
+                                state = MouseState.NONE;//Reset
 
-            if (currEvent.type == EventType.MouseDown && currEvent.button == 0)
-            {
-                currentAction.MouseOneDown();
+                            }
+                        }
+                        else
+                        {
+                            if (currEvent.type == EventType.MouseDown && currEvent.button == 0)
+                            {
+                                if(currentAction != null)
+                                {
+                                    currentAction.MouseOneDown();
+                                    state = MouseState.DOWN;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case MouseState.DOWN:
+                    {
+                        if (currEvent.type == EventType.MouseDrag && currEvent.button == 0)
+                        {
+                            if (currentAction != null)
+                            {
+                                currentAction.MouseOneDrag();
+                                state = MouseState.DRAGGED;
+                            }
+                        }
+                        else
+                        {
+                            state = MouseState.DRAGGED;
+                        }
+                    }
+                    break;
+                case MouseState.DRAGGED:
+                    {
+                        if (currEvent.type == EventType.MouseUp && currEvent.button == 0)
+                        {
+                            if (currentAction != null)
+                            {
+                                currentAction.MouseOneUp();
+                                state = MouseState.NONE;
+                            }
+                        }
+                    }
+                    break;
+                case MouseState.UP:
+                    {
+                        state = MouseState.NONE;
+                    }
+                    break;
             }
+        }
+      
+        public void SelectObject()
+        {
+            Transform parent;
+            Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+            RaycastHit hit;
 
-            else if (currEvent.type == EventType.MouseDrag && currEvent.button == 0)
+            if (Physics.Raycast(ray, out hit))
             {
-                currentAction.MouseOneDrag();
-            }
-            else if (currEvent.type == EventType.MouseUp && currEvent.button == 0)
-            {
-                currentAction.MouseOneUp();
-                Debug.Log("MouseUP");
-            }
+                if (hit.collider != null)
+                {
+                    if(hit.collider.tag == "SelectableObject")
+                    {
+                        Selection.activeObject = hit.transform.root;
+                    }
+                    //parent = hit.transform.parent;
 
-            else if (currEvent.type == EventType.MouseDown && currEvent.button == 1)
-            {
-                currentAction.MouseTwoDown();
+                    //if (hit.collider.GetComponent<PlacedObject>() != null)
+                    //{
+                    //    parent.GetComponent<PlacedObject>().GetParent();
+                    //}
+                }
             }
-
         }
 
     }
@@ -99,17 +171,25 @@ namespace ProductionTools
 
             if (owner.currentObject == null)
             {
+                //newObject = new CreateObjectCommand(owner.currentProject.myObjectPool.objectList[owner.sourceKey], positionB, positionA, positionB, positionC, settings.lookAtPoint, settings.spacing, owner.sourceKey, (int)myType, settings.rotateTo, settings.rotationCounter, owner);
+                //owner.AddCommand(newObject);
+                //Execute();
+            }
+
+            if(Vector3.Distance(positionA,positionC) > 1)
+            {
                 newObject = new CreateObjectCommand(owner.currentProject.myObjectPool.objectList[owner.sourceKey], positionB, positionA, positionB, positionC, settings.lookAtPoint, settings.spacing, owner.sourceKey, (int)myType, settings.rotateTo, settings.rotationCounter, owner);
                 owner.AddCommand(newObject);
                 Execute();
             }
-
+            
             so.Update();
             owner.Repaint();
+
         }
         public void MouseTwoDown()
         {
-            owner.RemoveCommand();
+            //owner.RemoveCommand();
             //owner.currentObject.Undo();
         }
         public void Execute()

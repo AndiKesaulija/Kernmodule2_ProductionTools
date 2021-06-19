@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-
 namespace ProductionTools
 {
-    [SelectionBase]
     public class ObjectProperties : MonoBehaviour
     {
         public int commandNum;
@@ -25,7 +23,23 @@ namespace ProductionTools
         public bool rotateTo;
         public int rotationCounter;
 
+        public void Highlight()
+        {
+            //get children (placed Object)
+            List<GameObject> children = new List<GameObject>();
+
+            foreach( Transform child in transform)
+            {
+                children.Add(child.gameObject);
+            }
+
+            //MakeGizmo of highlight
+            //EnableGizmo
+        }
+
+
 
     }
+
 }
 

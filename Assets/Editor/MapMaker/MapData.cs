@@ -13,23 +13,23 @@ namespace ProductionTools
 
         public void Add (GameObject obj, ObjectProperties item)
         {
-            GroupData test = new GroupData();
+            GroupData group = new GroupData();
 
-            test.commandNum = item.commandNum;
-            test.myType = item.myType;
-            test.p0 = item.p0;
-            test.p1 = item.p1;
-            test.p2 = item.p2;
-            test.lookAtPoint = item.lookAtPoint;
+            group.commandNum = item.commandNum;
+            group.myType = item.myType;
+            group.p0 = item.p0;
+            group.p1 = item.p1;
+            group.p2 = item.p2;
+            group.lookAtPoint = item.lookAtPoint;
 
-            test.spacing = item.spacing;
-            test.buildingID = item.buildingID;
-            test.rotateTo = item.rotateTo;
-            test.rotationCounter = item.rotationCounter;
+            group.spacing = item.spacing;
+            group.buildingID = item.buildingID;
+            group.rotateTo = item.rotateTo;
+            group.rotationCounter = item.rotationCounter;
 
-            test.position = obj.transform.TransformPoint(item.GetComponent<ObjectProperties>().p1);
+            group.position = obj.transform.TransformPoint(item.GetComponent<ObjectProperties>().p1);
 
-            mapData.Add(test);
+            mapData.Add(group);
         }
     }
 

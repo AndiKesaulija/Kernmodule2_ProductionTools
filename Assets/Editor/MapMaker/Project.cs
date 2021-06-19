@@ -23,11 +23,9 @@ namespace ProductionTools
         public string mapDirectory;
         public string objectDirectory;
 
-        //public List<CreateObjectCommand> allObjects = new List<CreateObjectCommand>();
         public Project(string projectName, MapMaker owner)
         {
             name = projectName;
-            //myMaps = new List<Map>();
             myObjectPool = new ObjectPool();
             this.owner = owner;
 
@@ -103,19 +101,20 @@ namespace ProductionTools
             if (target != null)
             {
                 currentMap.myMapData.mapData.Clear();
+
                 foreach (CreateObjectCommand obj in placedObjects)
                 {
                     try
                     {
                         currentMap.myMapData.Add(obj.GameObjectInstance, obj.GameObjectInstance.GetComponent<ObjectProperties>());
                     }
-                    catch(NullReferenceException)
+                    catch (NullReferenceException)
                     {
                         Debug.Log("NO Line component");
                     }
                     catch (Exception e)
                     {
-                        Debug.Log(e);
+                        //Debug.Log(e);
                     }
                 }
 

@@ -57,33 +57,37 @@ namespace ProductionTools
 
                         if (currentObject != null)
                         {
-                            
-                            if (owner.myInputManager.currentAction.myType == ObjectType.single)
+                            switch (owner.myInputManager.currentAction.myType)
                             {
-                                HandleSingle();
-                            }
-                            if (owner.myInputManager.currentAction.myType == ObjectType.line)
-                            {
-                                HandleLine();
+                                case ObjectType.single:
+                                    {
+                                        HandleSingle();
 
-                                //DisableTool
-                                if (owner.myInputManager.currentAction != null)
-                                {
-                                    Tools.current = Tool.None;
-                                }
-                            }
-                            if (owner.myInputManager.currentAction.myType == ObjectType.curve)
-                            {
-                                HandleCurve();
+                                    }
+                                    break;
+                                case ObjectType.line:
+                                    {
+                                        HandleLine();
 
-                                //DisableTool
-                                if (owner.myInputManager.currentAction != null)
-                                {
-                                    Tools.current = Tool.None;
-                                }
+                                        ////DisableTool
+                                        //if (owner.myInputManager.currentAction != null)
+                                        //{
+                                        //    Tools.current = Tool.None;
+                                        //}
+                                    }
+                                    break;
+                                case ObjectType.curve:
+                                    {
+                                        HandleCurve();
+
+                                        ////DisableTool
+                                        //if (owner.myInputManager.currentAction != null)
+                                        //{
+                                        //    Tools.current = Tool.None;
+                                        //}
+                                    }
+                                    break;
                             }
-                            
-                           
                         }
                     }
                     else

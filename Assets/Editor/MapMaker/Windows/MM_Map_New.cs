@@ -31,7 +31,6 @@ namespace ProductionTools
                 if (owner.currentProject != null)
                 {
                     owner.currentProject.NewMap(name);
-                    owner.ReloadMapMaker();
                 }
                 else
                 {

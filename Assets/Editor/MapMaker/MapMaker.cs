@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -9,7 +10,6 @@ namespace ProductionTools
     [ExecuteInEditMode]
     public class MapMaker : EditorWindow
     {
-
         public Project currentProject;
 
         public InputManager myInputManager;
@@ -37,6 +37,7 @@ namespace ProductionTools
         private bool[] placeableObjects = new bool [0];
         public bool[] buttons = new bool[0];
 
+        public bool isActive;
         //GUI
         private Vector2 scrollObjectList = new Vector2(0,0);
         public object selection;
@@ -66,6 +67,12 @@ namespace ProductionTools
 
         private void OnEnable()
         {
+            //Set owner of Postprocessor
+            MyAssetPostprocessor.owner = this;
+
+            Tools.hidden = true;
+            isActive = true;
+
             projectFolder = Path.Combine(Application.dataPath, "MapMaker", "Projects");
             
             ObjectFolder = Path.Combine(Application.dataPath, "Resources", "MapMaker", "Objects");
@@ -112,7 +119,9 @@ namespace ProductionTools
         }
         private void OnDisable()
         {
-            if(currentProject != null)
+            Tools.hidden = false;
+
+            if (currentProject != null)
             {
                 currentProject.ClearMap();
             }
@@ -133,15 +142,52 @@ namespace ProductionTools
                 placeableObjects = new bool[currentProject.myObjectPool.objectList.Count];//MakeButons for Objects
                 buttons = new bool[actions.Count];//MakeButtons for Actions
 
+                isActive = true;
+
             }
             else
             {
                 Debug.Log("No current Project");
             }
 
+
             Repaint();
         }
         
+        void MapMakerStatsGUI()
+        {
+            GUILayout.Label($"Current Project: {currentProject}");
+            if(currentProject != null)
+            {
+                string currentMapName = "";
+                if (currentProject.currentMap != null)
+                {
+                    currentMapName = currentProject.currentMap.name;
+                }
+
+                if( currentProject.currentMap != null)
+                {
+                    GUILayout.Label($"ObjectPool Count: {currentProject.myObjectPool.objectList.Count} Map: {currentMapName}");
+                }
+                else
+                {
+                    GUILayout.Label($"ObjectPool Count: {currentProject.myObjectPool.objectList.Count} Map: No map selected");
+
+                }
+
+
+            }
+            else
+            {
+                GUILayout.Label($"ObjectPoolCount: No Current Project");
+            }
+            
+
+
+
+            GUILayout.Label($"MouseState: {myInputManager.state}");
+            GUILayout.Label($"onHover: {myInputManager.onHover}");
+        }
         void OnGUI()
         {
             //Menu Bar
@@ -151,7 +197,11 @@ namespace ProductionTools
             ObjectDrawDropdown(new GUIContent("Objects"));
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space();
-            
+
+            //MapMaker Sats
+            MapMakerStatsGUI();
+            EditorGUILayout.Space();
+
             //Current placeable objects
             GUIObjectPool();
             EditorGUILayout.Space();
@@ -302,42 +352,51 @@ namespace ProductionTools
             isSelected = false;
             source = null;
 
-           if(currentProject != null)
+            if(currentProject != null && isActive == true)
             {
-                for (int i = 0; i < placeableObjects.Length; i++)
+                try
                 {
-                    if (placeableObjects[i] = GUILayout.Toggle(placeableObjects[i], currentProject.myObjectPool.objectList[i].name, "Button"))
+                    for (int i = 0; i < placeableObjects.Length; i++)
                     {
-
-                        if (placeableObjects[i] == true)
+                        if (placeableObjects[i] = GUILayout.Toggle(placeableObjects[i], currentProject.myObjectPool.objectList[i].name, "Button"))
                         {
-                            sourceKey = i;
-                            source = currentProject.myObjectPool.objectList[i];
-                            isSelected = true;
-                        }
-
-                        if (Selection.activeGameObject != null && myInputManager.currentAction != null) 
-                        {
-                            if(Selection.activeGameObject.GetComponent<ObjectProperties>() != null)
+                            if (placeableObjects[i] == true)
                             {
-                                Selection.activeGameObject.GetComponent<ObjectProperties>().buildingID = i;
-                                myInputManager.currentAction.settings.Update();
+                                sourceKey = i;
+                                source = currentProject.myObjectPool.objectList[i];
+                                isSelected = true;
                             }
-                           
-                        }
 
-
-                        for (int j = 0; j < placeableObjects.Length; j++)
-                        {
-                            if (j != i)
+                            if (Selection.activeGameObject != null && myInputManager.currentAction != null)
                             {
-                                placeableObjects[j] = false;
+                                if (Selection.activeGameObject.GetComponent<ObjectProperties>() != null)
+                                {
+                                    Selection.activeGameObject.GetComponent<ObjectProperties>().buildingID = i;
+                                    myInputManager.currentAction.settings.Update();
+                                }
+
+                            }
+
+
+                            for (int j = 0; j < placeableObjects.Length; j++)
+                            {
+                                if (j != i)
+                                {
+                                    placeableObjects[j] = false;
+                                }
                             }
                         }
                     }
                 }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    Debug.Log(e.StackTrace);
+
+                }
+
+
             }
-           
             
             EditorGUILayout.EndScrollView();
         }
@@ -354,6 +413,9 @@ namespace ProductionTools
         {
             GUILayout.Label("Tools");
             myInputManager.currentAction = GUIList(actions);
+
+
+
         }
         private void GUIToolSettings(IActionInput currentTool)
         {
@@ -390,8 +452,6 @@ namespace ProductionTools
             }
 
         }
-
-      
         public void SaveProject()
         {
             string path = currentProject.savePath;
@@ -405,7 +465,6 @@ namespace ProductionTools
                 {
                     currentProject.SaveMap(currentProject.currentMap, allObjects);
                 }
-                AssetDatabase.Refresh();
 
                 var exportedPackageAssetList = new List<string>();
 
@@ -424,20 +483,24 @@ namespace ProductionTools
         }
         public void LoadProject(string path)
         {
+            isActive = false;
+
             ClearProject();
 
-
-            string[] projectPath = path.Split('/', '\\' , '.');
+            string[] projectPath = path.Split('/', '\\', '.');
             string projectName = projectPath[projectPath.Length - 2];
 
             currentProject = new Project(projectName, this);
-
+            
             AssetDatabase.ImportPackage(path, false);
-            AssetDatabase.Refresh();
-
-            ReloadMapMaker();
 
         }
+
+       
+
+
+
+
         public void ClearProject()
         {
             if(currentProject != null)
@@ -464,15 +527,41 @@ namespace ProductionTools
         }
         void OnSceneGUI(SceneView sceneView)
         {
+            //Set Tool to SelectionTool
+            //if (Tools.current != Tool.Custom)
+            //{
+            //    Tools.current = Tool.Custom;
+            //}
 
             Event e = Event.current;
 
             myHandler.OnSceneGUI();//Show GUI Handlers for selected GroupObject
 
-            if (myInputManager.currentAction != null)
+            //if (myInputManager.currentAction != null)
+            //{
+            //    myInputManager.HandleEvent(e);
+            //}
+
+            myInputManager.HandleEvent(e);
+
+            Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, float.MaxValue))
             {
-                myInputManager.HandleEvent(e);
+                //Hover Bool true
+                if(hit.collider.tag == "SelectableObject")
+                {
+                    myInputManager.onHover = true;
+                }
+                
+
             }
+            else
+            {
+                myInputManager.onHover = false;
+            }
+
+
 
         }
         public Vector3 RayPosition()
@@ -494,9 +583,9 @@ namespace ProductionTools
             allObjects.Add(command);
             allObjects[allObjects.Count - 1].Execute();
         }
-        public void RemoveCommand()
+        public void RemoveCommand(int num)
         {
-            allObjects[allObjects.Count - 1].Undo();
+            allObjects[num].Undo();
             allObjects.RemoveAt(allObjects.Count - 1);
         }
         public void AddAction(IActionInput action)
