@@ -16,10 +16,6 @@ namespace ProductionTools
             {
                 owner.ReloadMapMaker();
             }
-            else
-            {
-                Debug.Log("MapMaker not active");
-            }
         }
     }
 }

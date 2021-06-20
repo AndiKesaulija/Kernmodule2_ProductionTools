@@ -5,8 +5,8 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 
-using System.Runtime.Serialization.Formatters.Binary;//Maybe
-using System.Xml.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+
 namespace ProductionTools
 {
     public class Project : INamed
@@ -55,7 +55,6 @@ namespace ProductionTools
             Map newMap = new Map(name, mapDirectory);
             currentMap = newMap;
 
-            owner.SaveProject();
         }
         public void LoadMap(string path)
         {
@@ -133,10 +132,7 @@ namespace ProductionTools
                     {
                         Debug.Log("NO Line component");
                     }
-                    catch (Exception e)
-                    {
-                        //Debug.Log(e);
-                    }
+                   
                 }
 
                 target.WriteMap();
@@ -145,6 +141,9 @@ namespace ProductionTools
             {
                 Debug.Log("No Map Selected");
             }
+
+            owner.SaveProject();
+
         }
         public void ClearMap()
         {

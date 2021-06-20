@@ -121,16 +121,16 @@ namespace ProductionTools
         {
             Tools.hidden = false;
 
-            if (currentProject != null)
-            {
-                currentProject.ClearMap();
-            }
+            //if (currentProject != null)
+            //{
+            //    currentProject.ClearMap();
+            //}
 
-            foreach(GameObject obj in placeObjects)
-            {
-                DestroyImmediate(obj);
-            }
-            placeObjects.Clear();
+            //foreach(GameObject obj in placeObjects)
+            //{
+            //    DestroyImmediate(obj);
+            //}
+            //placeObjects.Clear();
             SceneView.duringSceneGui -= this.OnSceneGUI;
         }
         public void ReloadMapMaker()
@@ -156,37 +156,33 @@ namespace ProductionTools
         
         void MapMakerStatsGUI()
         {
-            GUILayout.Label($"Current Project: {currentProject}");
+
             if(currentProject != null)
             {
-                string currentMapName = "";
-                if (currentProject.currentMap != null)
-                {
-                    currentMapName = currentProject.currentMap.name;
-                }
+                GUILayout.Label($"Current Project: {currentProject.name}");
 
-                if( currentProject.currentMap != null)
+                if(currentProject.currentMap != null)
                 {
-                    GUILayout.Label($"ObjectPool Count: {currentProject.myObjectPool.objectList.Count} Map: {currentMapName}");
+
+                    GUILayout.Label($"Current Map: {currentProject.currentMap.name}");
+                    GUILayout.Label($"ObjectPool Count: {currentProject.myObjectPool.objectList.Count}");
+
                 }
                 else
                 {
-                    GUILayout.Label($"ObjectPool Count: {currentProject.myObjectPool.objectList.Count} Map: No map selected");
+                    GUILayout.Label($"Current Map: No Current Map");
+                    GUILayout.Label($"ObjectPool Count: {currentProject.myObjectPool.objectList.Count}");
 
                 }
-
 
             }
             else
             {
-                GUILayout.Label($"ObjectPoolCount: No Current Project");
+                GUILayout.Label($"Current Project: No Current Project");
+                GUILayout.Label($"Current Map: ");
+                GUILayout.Label($"ObjectPool Count: ");
             }
-            
 
-
-
-            GUILayout.Label($"MouseState: {myInputManager.state}");
-            GUILayout.Label($"onHover: {myInputManager.onHover}");
         }
         void OnGUI()
         {
@@ -458,13 +454,12 @@ namespace ProductionTools
             string SaveName = currentProject.name;
             string saveLocation = Path.Combine(path, SaveName);
 
-            Debug.Log(saveLocation);
             if(currentProject != null)
             {
-                if(currentProject.currentMap != null)
-                {
-                    currentProject.SaveMap(currentProject.currentMap, allObjects);
-                }
+                //if(currentProject.currentMap != null)
+                //{
+                //    currentProject.SaveMap(currentProject.currentMap, allObjects);
+                //}
 
                 var exportedPackageAssetList = new List<string>();
 

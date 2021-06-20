@@ -33,71 +33,74 @@ namespace ProductionTools
             //Disable selection in SceneView
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(GetHashCode(), FocusType.Passive));
 
-            switch (state)
+            if (!currEvent.alt)
             {
-                case MouseState.NONE:
-                    {
-                        if (onHover == true)
+                switch (state)
+                {
+                    case MouseState.NONE:
                         {
-                            if (currEvent.type == EventType.MouseDown && currEvent.button == 0)
+                            if (onHover == true)
                             {
-                                SelectObject();
-                                state = MouseState.NONE;//Reset
-
-                            }
-                        }
-                        else
-                        {
-                            if (currEvent.type == EventType.MouseDown && currEvent.button == 0)
-                            {
-                                if(currentAction != null)
+                                if (currEvent.type == EventType.MouseDown && currEvent.button == 0)
                                 {
-                                    currentAction.MouseOneDown();
-                                    state = MouseState.DOWN;
+                                    SelectObject();
+                                    state = MouseState.NONE;//Reset
+
+                                }
+                            }
+                            else
+                            {
+                                if (currEvent.type == EventType.MouseDown && currEvent.button == 0)
+                                {
+                                    if (currentAction != null)
+                                    {
+                                        currentAction.MouseOneDown();
+                                        state = MouseState.DOWN;
+                                    }
                                 }
                             }
                         }
-                    }
-                    break;
-                case MouseState.DOWN:
-                    {
-                        if (currEvent.type == EventType.MouseDrag && currEvent.button == 0)
+                        break;
+                    case MouseState.DOWN:
                         {
-                            if (currentAction != null)
+                            if (currEvent.type == EventType.MouseDrag && currEvent.button == 0)
                             {
-                                currentAction.MouseOneDrag();
+                                if (currentAction != null)
+                                {
+                                    currentAction.MouseOneDrag();
+                                    state = MouseState.DRAGGED;
+                                }
+                            }
+                            else
+                            {
                                 state = MouseState.DRAGGED;
                             }
                         }
-                        else
+                        break;
+                    case MouseState.DRAGGED:
                         {
-                            state = MouseState.DRAGGED;
-                        }
-                    }
-                    break;
-                case MouseState.DRAGGED:
-                    {
-                        if (currEvent.type == EventType.MouseUp && currEvent.button == 0)
-                        {
-                            if (currentAction != null)
+                            if (currEvent.type == EventType.MouseUp && currEvent.button == 0)
                             {
-                                currentAction.MouseOneUp();
-                                state = MouseState.NONE;
+                                if (currentAction != null)
+                                {
+                                    currentAction.MouseOneUp();
+                                    state = MouseState.NONE;
+                                }
                             }
                         }
-                    }
-                    break;
-                case MouseState.UP:
-                    {
-                        state = MouseState.NONE;
-                    }
-                    break;
+                        break;
+                    case MouseState.UP:
+                        {
+                            state = MouseState.NONE;
+                        }
+                        break;
+                }
             }
+          
         }
       
         public void SelectObject()
         {
-            Transform parent;
             Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
             RaycastHit hit;
 
@@ -109,12 +112,6 @@ namespace ProductionTools
                     {
                         Selection.activeObject = hit.transform.root;
                     }
-                    //parent = hit.transform.parent;
-
-                    //if (hit.collider.GetComponent<PlacedObject>() != null)
-                    //{
-                    //    parent.GetComponent<PlacedObject>().GetParent();
-                    //}
                 }
             }
         }

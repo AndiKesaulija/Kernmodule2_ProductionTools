@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Runtime.Serialization;
+using System.IO;
 
 namespace ProductionTools
 {
@@ -20,13 +22,6 @@ namespace ProductionTools
 
             group.commandNum = item.commandNum;
             group.myType = item.myType;
-
-            //group.p0 = item.p0;
-            //group.p1 = item.p1;
-            //group.p2 = item.p2;
-            //group.lookAtPoint = item.lookAtPoint;
-
-            //group.position = obj.transform.TransformPoint(item.GetComponent<ObjectProperties>().p1);
 
             //Binary
             group.pos0x = item.p0.x;
@@ -54,8 +49,16 @@ namespace ProductionTools
             group.rotateTo = item.rotateTo;
             group.rotationCounter = item.rotationCounter;
 
-
             mapData.Add(group);
+        }
+
+        [OnDeserializing()]
+        void OnDeserializing(StreamingContext context)
+        {
+            mapName = "Unknown";
+            folderpath = "Unknown";
+            fileName = "Unknown";
+
         }
     }
 

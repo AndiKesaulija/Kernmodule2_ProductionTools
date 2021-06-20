@@ -143,6 +143,8 @@ namespace ProductionTools
 
             
             owner.myHandler.ObjectProperties.Add(PlaceObject.GetComponent<ObjectProperties>());
+
+            Selection.activeGameObject = PlaceObject;
             return PlaceObject;
 
         }

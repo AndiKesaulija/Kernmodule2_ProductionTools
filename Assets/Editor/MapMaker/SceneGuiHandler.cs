@@ -34,7 +34,7 @@ namespace ProductionTools
      
         public void OnSceneGUI()
         {
-            if (Selection.activeObject != null)
+            if (Selection.activeGameObject != null)
             {
                 
                 try
@@ -42,10 +42,9 @@ namespace ProductionTools
                     if (Selection.activeGameObject.GetComponent<ObjectProperties>() != null)
                     {
 
-                        owner.newselection = Selection.activeObject;
-                        if (owner.selection != owner.newselection)
+                        owner.newselection = Selection.activeGameObject;
+                        if (owner.selection != owner.newselection && owner.myInputManager.currentAction != null)
                         {
-                            //Debug.Log("new Object Selected");
                             owner.myInputManager.currentAction.settings.Update();
                             owner.Repaint();
                             owner.selection = owner.newselection;
@@ -55,36 +54,23 @@ namespace ProductionTools
                         owner.currentObject = owner.allObjects[Selection.activeGameObject.GetComponent<ObjectProperties>().commandNum - 1];
                         currentObject = Selection.activeGameObject.GetComponent<ObjectProperties>();
 
-                        if (currentObject != null)
+                        if (currentObject != null && owner.myInputManager.currentAction != null)
                         {
                             switch (owner.myInputManager.currentAction.myType)
                             {
                                 case ObjectType.single:
                                     {
                                         HandleSingle();
-
                                     }
                                     break;
                                 case ObjectType.line:
                                     {
                                         HandleLine();
-
-                                        ////DisableTool
-                                        //if (owner.myInputManager.currentAction != null)
-                                        //{
-                                        //    Tools.current = Tool.None;
-                                        //}
                                     }
                                     break;
                                 case ObjectType.curve:
                                     {
                                         HandleCurve();
-
-                                        ////DisableTool
-                                        //if (owner.myInputManager.currentAction != null)
-                                        //{
-                                        //    Tools.current = Tool.None;
-                                        //}
                                     }
                                     break;
                             }
@@ -92,13 +78,12 @@ namespace ProductionTools
                     }
                     else
                     {
-
                         owner.currentObject = null;
                     }
                 }
                 catch(Exception e)
                 {
-                    //Debug.Log(e);
+                    Debug.Log(e);
                 }
                 
             }
