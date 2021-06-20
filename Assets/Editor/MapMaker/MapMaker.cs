@@ -544,7 +544,8 @@ namespace ProductionTools
             if (Physics.Raycast(ray, out hit, float.MaxValue))
             {
                 //Hover Bool true
-                if(hit.collider.tag == "SelectableObject")
+
+                if(hit.collider.transform.root.GetComponent<ObjectProperties>())
                 {
                     myInputManager.onHover = true;
                 }

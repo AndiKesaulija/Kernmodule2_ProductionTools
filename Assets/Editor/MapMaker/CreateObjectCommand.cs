@@ -129,7 +129,6 @@ namespace ProductionTools
             GameObject PlaceObject = new GameObject("PlaceObject");
             handleTransform = PlaceObject.transform;
 
-            PlaceObject.tag = "SelectableObject";
             PlaceObject.transform.position = p1;//Set transform to midpoint
             PlaceObject.AddComponent<ObjectProperties >();
 
@@ -166,8 +165,7 @@ namespace ProductionTools
 
             test.transform.localPosition = new Vector3(0,0,0);
             test.transform.localRotation = rotation;
-            //SetTag
-            test.tag = "SelectableObject";
+
         }
         void UpdateLine()
         {
@@ -197,8 +195,7 @@ namespace ProductionTools
                 GameObject test = GameObject.Instantiate(Prefab, GameObjectInstance.transform, false);
                 test.transform.localPosition = pos;
                 test.transform.localRotation = rotation;
-                //SetTag
-                test.tag = "SelectableObject";
+
             }
         }
         void UpdateCurve()
@@ -229,8 +226,7 @@ namespace ProductionTools
                 GameObject test = GameObject.Instantiate(Prefab, GameObjectInstance.transform, false);
                 test.transform.localPosition = pos;
                 test.transform.localRotation = rotation;
-                //SetTag
-                test.tag = "SelectableObject";
+
             }
         }
 

@@ -161,7 +161,6 @@ namespace ProductionTools
                     foreach (Renderer R in allRenderers)
                     {
                         R.gameObject.AddComponent<BoxCollider>();
-                        R.gameObject.transform.tag = "SelectableObject";
                     }
 
                     PrefabUtility.SaveAsPrefabAsset(tempInstance, assetPath + tempInstance.name + ".prefab");

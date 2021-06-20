@@ -108,7 +108,7 @@ namespace ProductionTools
             {
                 if (hit.collider != null)
                 {
-                    if(hit.collider.tag == "SelectableObject")
+                    if (hit.collider.transform.root.GetComponent<ObjectProperties>())
                     {
                         Selection.activeObject = hit.transform.root;
                     }
